@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "Wylder Trails",
+    "slug": "wylder-trails",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1A5C38"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wylder.trails",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Wylder Trails usa sua localização para mostrar trilhas próximas e gravar seu percurso.",
+        "NSLocationAlwaysUsageDescription": "Wylder Trails usa sua localização para gravar trilhas em segundo plano.",
+        "NSPhotoLibraryUsageDescription": "Wylder Trails precisa acessar suas fotos para fazer upload nas trilhas.",
+        "NSCameraUsageDescription": "Wylder Trails usa a câmera para tirar fotos das trilhas."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1A5C38"
+      },
+      "package": "com.wylder.trails",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-location",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Wylder Trails precisa acessar suas fotos.",
+          "cameraPermission": "Wylder Trails usa a câmera para fotos de trilhas."
+        }
+      ],
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsDownloadToken": "sk.PLACEHOLDER_SK_TOKEN"
+        }
+      ]
+    ],
+    "scheme": "wylder-trails",
+    "extra": {
+      "eas": {
+        "projectId": "PLACEHOLDER_EAS_PROJECT_ID"
+      }
+    }
+  }
+}
