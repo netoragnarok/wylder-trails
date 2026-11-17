@@ -1,4 +1,4 @@
-const admin = require('../services/firebase');
+const getAdmin = require('../services/firebase');
 const db = require('../db');
 
 async function authenticate(req, res, next) {
@@ -10,8 +10,9 @@ async function authenticate(req, res, next) {
   const token = authHeader.split('Bearer ')[1];
 
   try {
+    const admin = getAdmin();
     const decoded = await admin.auth().verifyIdToken(token);
-    
+
     // Busca ou cria usuário no banco
     const { rows } = await db.query(
       'SELECT * FROM users WHERE firebase_uid = $1',
@@ -19,7 +20,6 @@ async function authenticate(req, res, next) {
     );
 
     if (rows.length === 0) {
-      // Primeiro acesso: cria o usuário
       const { rows: newUser } = await db.query(
         `INSERT INTO users (firebase_uid, name, email, avatar_url)
          VALUES ($1, $2, $3, $4) RETURNING *`,
