@@ -117,7 +117,7 @@ O projeto foi desenvolvido com 4 arquivos de especificação:
 
 ## Repositório
 
-**GitHub:** [https://github.com/SEU_USUARIO/wylder-trails](https://github.com/SEU_USUARIO/wylder-trails)
+**GitHub:** [https://github.com/netoragnarok/wylder-trails](https://github.com/netoragnarok/wylder-trails)
 
 ---
 
