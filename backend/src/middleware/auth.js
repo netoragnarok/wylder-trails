@@ -1,6 +1,8 @@
-const getAdmin = require('../services/firebase');
 const db = require('../db');
 
+// Middleware de autenticação simplificado para deploy sem Firebase.
+// Aceita o header Authorization: Bearer <firebase_uid>
+// Em produção com Firebase configurado, substitua pela verificação de token JWT real.
 async function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -8,32 +10,26 @@ async function authenticate(req, res, next) {
   }
 
   const token = authHeader.split('Bearer ')[1];
+  if (!token || token === 'undefined') {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
 
   try {
-    const admin = getAdmin();
-    const decoded = await admin.auth().verifyIdToken(token);
-
-    // Busca ou cria usuário no banco
+    // Busca usuário pelo firebase_uid (que é o token no modo simplificado)
     const { rows } = await db.query(
       'SELECT * FROM users WHERE firebase_uid = $1',
-      [decoded.uid]
+      [token]
     );
 
     if (rows.length === 0) {
-      const { rows: newUser } = await db.query(
-        `INSERT INTO users (firebase_uid, name, email, avatar_url)
-         VALUES ($1, $2, $3, $4) RETURNING *`,
-        [decoded.uid, decoded.name || 'Trilheiro', decoded.email, decoded.picture || null]
-      );
-      req.user = newUser[0];
-    } else {
-      req.user = rows[0];
+      return res.status(401).json({ error: 'Usuário não encontrado' });
     }
 
+    req.user = rows[0];
     next();
   } catch (err) {
     console.error('Auth error:', err.message);
-    return res.status(401).json({ error: 'Token inválido ou expirado' });
+    return res.status(500).json({ error: 'Erro de autenticação' });
   }
 }
 
