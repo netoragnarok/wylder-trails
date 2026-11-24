@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "wylder-word-generator": {
+      "command": "python",
+      "args": ["mcp-word-generator/server.py"],
+      "cwd": "c:\\Users\\ariberto62280456\\Wylder\\wylder-trails",
+      "disabled": false,
+      "description": "Gera documentos Word (.docx) a partir dos arquivos Markdown do projeto Wylder Trails"
+    }
+  }
+}
