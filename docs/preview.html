@@ -347,12 +347,6 @@ body {
         <p>Trilhas perto de você</p>
       </div>
 
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" placeholder="Buscar trilhas, cidades..." oninput="applyFilters()">
-        <span class="search-clear" id="search-clear" onclick="clearSearch()">✕</span>
-      </div>
-
       <div class="filter-row" id="filter-row">
         <div class="chip active" data-filter="all"    onclick="setFilter(this)">Todas</div>
         <div class="chip"        data-filter="fácil"  onclick="setFilter(this)">Fácil</div>
@@ -839,9 +833,6 @@ function setFilter(el) {
 }
 
 function applyFilters() {
-  const q = document.getElementById('search-input').value.trim().toLowerCase();
-  const clear = document.getElementById('search-clear');
-  clear.style.display = q ? 'block' : 'none';
   const cards = document.querySelectorAll('#trail-list .trail-card');
   let visible = 0;
   cards.forEach(card => {
@@ -849,25 +840,17 @@ function applyFilters() {
     const parking = card.dataset.parking === 'true';
     const water   = card.dataset.waterfall === 'true';
     const camp    = card.dataset.camping === 'true';
-    const name    = card.dataset.name;
     let show = true;
-    if (q && !name.includes(q)) show = false;
-    if (currentFilter === 'fácil'    && diff !== 'fácil')    show = false;
-    if (currentFilter === 'moderada' && diff !== 'moderada') show = false;
-    if (currentFilter === 'difícil'  && diff !== 'difícil')  show = false;
-    if (currentFilter === 'parking'  && !parking)            show = false;
-    if (currentFilter === 'waterfall'&& !water)              show = false;
-    if (currentFilter === 'camping'  && !camp)               show = false;
+    if (currentFilter === 'fácil'     && diff !== 'fácil')    show = false;
+    if (currentFilter === 'moderada'  && diff !== 'moderada') show = false;
+    if (currentFilter === 'difícil'   && diff !== 'difícil')  show = false;
+    if (currentFilter === 'parking'   && !parking)            show = false;
+    if (currentFilter === 'waterfall' && !water)              show = false;
+    if (currentFilter === 'camping'   && !camp)               show = false;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
-  const noRes = document.getElementById('no-results');
-  noRes.classList.toggle('show', visible === 0);
-}
-
-function clearSearch() {
-  document.getElementById('search-input').value = '';
-  applyFilters();
+  document.getElementById('no-results').classList.toggle('show', visible === 0);
 }
 
 // ═══════════════════════════════════════════════════════
