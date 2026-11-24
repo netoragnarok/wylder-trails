@@ -2,477 +2,344 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wylder Trails — Preview</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary:#1A5C38; --primary-light:#2D8A57; --primary-pale:#E8F5EE;
+  --accent:#F4A228; --accent-light:#FEF3DC;
+  --easy:#38A169; --moderate:#F4A228; --hard:#E53E3E;
+  --bg:#F7F8FA; --surface:#FFFFFF; --border:#E2E8F0;
+  --text:#1A202C; --text2:#718096; --text3:#A0AEC0;
+  --danger:#E53E3E; --danger-light:#FEE8E8;
+  --shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:#1a1a2e; display:flex; justify-content:center;
+  align-items:center; min-height:100vh; padding:20px;
+}
+.phone {
+  width:390px; height:844px; background:var(--bg);
+  border-radius:44px; overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5),inset 0 0 0 1px rgba(255,255,255,0.1);
+  display:flex; flex-direction:column; position:relative;
+}
+.status-bar {
+  background:var(--surface); padding:14px 24px 8px;
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:12px; font-weight:600; color:var(--text); flex-shrink:0;
+}
+.status-bar .time { font-size:15px; font-weight:700; }
+.status-icons { display:flex; gap:6px; }
 
-  :root {
-    --primary: #1A5C38;
-    --primary-light: #2D8A57;
-    --primary-pale: #E8F5EE;
-    --accent: #F4A228;
-    --accent-light: #FEF3DC;
-    --easy: #38A169;
-    --moderate: #F4A228;
-    --hard: #E53E3E;
-    --bg: #F7F8FA;
-    --surface: #FFFFFF;
-    --border: #E2E8F0;
-    --text: #1A202C;
-    --text2: #718096;
-    --text3: #A0AEC0;
-    --danger: #E53E3E;
-    --danger-light: #FEE8E8;
-    --radius: 16px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-  }
+/* Screens */
+.screen { display:none; flex-direction:column; flex:1; overflow:hidden; }
+.screen.active { display:flex; }
+.scroll { flex:1; overflow-y:auto; }
+.scroll::-webkit-scrollbar { display:none; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #1a1a2e;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-  }
+/* Bottom nav */
+.bottom-nav {
+  background:var(--surface); border-top:1px solid var(--border);
+  display:flex; padding:8px 0 20px; flex-shrink:0;
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  gap:3px; cursor:pointer; padding:4px 0; color:var(--text3); font-size:10px;
+}
+.nav-item.active { color:var(--primary); }
+.nav-item .icon { font-size:22px; }
+.nav-add .icon-wrap {
+  width:50px; height:50px; border-radius:25px; background:var(--primary);
+  display:flex; align-items:center; justify-content:center; margin-top:-18px;
+  box-shadow:0 4px 16px rgba(26,92,56,0.4);
+}
+.nav-add .icon { font-size:26px; color:white; }
 
-  /* Phone frame */
-  .phone {
-    width: 390px;
-    height: 844px;
-    background: var(--bg);
-    border-radius: 44px;
-    overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
+/* ── FEED ── */
+.feed-header { background:var(--surface); padding:16px 20px 12px; }
+.feed-header h2 { font-size:20px; font-weight:800; color:var(--text); }
+.feed-header p { font-size:13px; color:var(--text2); margin-top:2px; }
+.search-bar {
+  margin:12px 20px; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:0; display:flex; align-items:center; overflow:hidden;
+}
+.search-bar input {
+  flex:1; border:none; outline:none; padding:11px 14px; font-size:14px;
+  color:var(--text); background:transparent; font-family:inherit;
+}
+.search-bar .search-icon { padding:0 14px; color:var(--text3); font-size:16px; }
+.search-bar .search-clear {
+  padding:0 14px; color:var(--text3); cursor:pointer; font-size:16px;
+  display:none;
+}
+.filter-row { display:flex; gap:8px; padding:0 20px 12px; overflow-x:auto; }
+.filter-row::-webkit-scrollbar { display:none; }
+.chip {
+  white-space:nowrap; padding:7px 16px; border-radius:20px;
+  background:var(--surface); border:1px solid var(--border);
+  font-size:13px; color:var(--text2); cursor:pointer; font-weight:500;
+  transition:all .2s; user-select:none;
+}
+.chip.active { background:var(--primary); border-color:var(--primary); color:white; }
+.trail-list { padding:0 20px 20px; display:flex; flex-direction:column; gap:16px; }
+.trail-card {
+  background:var(--surface); border-radius:16px; overflow:hidden;
+  box-shadow:var(--shadow); cursor:pointer; transition:transform .15s,box-shadow .15s;
+}
+.trail-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.12); }
+.trail-card.hidden { display:none; }
+.card-img-wrap { position:relative; }
+.card-img-wrap img { width:100%; height:160px; object-fit:cover; display:block; }
+.diff-badge {
+  position:absolute; top:12px; right:12px; padding:4px 12px;
+  border-radius:20px; color:white; font-size:11px; font-weight:700; text-transform:capitalize;
+}
+.card-body { padding:14px; }
+.card-name { font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.card-loc { font-size:12px; color:var(--text2); margin-bottom:10px; }
+.card-stats { display:flex; gap:14px; margin-bottom:10px; }
+.card-stat { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text2); }
+.card-attrs { display:flex; gap:6px; }
+.attr-icon { background:var(--primary-pale); border-radius:6px; padding:4px 6px; font-size:13px; }
+.attr-icon.danger { background:var(--danger-light); }
+.no-results {
+  text-align:center; padding:40px 20px; color:var(--text3);
+  font-size:14px; display:none;
+}
+.no-results.show { display:block; }
 
-  /* Status bar */
-  .status-bar {
-    background: var(--surface);
-    padding: 14px 24px 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text);
-    flex-shrink: 0;
-  }
-  .status-bar .time { font-size: 15px; font-weight: 700; }
-  .status-icons { display: flex; gap: 6px; align-items: center; }
-  .status-icons span { font-size: 14px; }
+/* ── DETAIL ── */
+.detail-photo { position:relative; }
+.detail-photo img { width:100%; height:240px; object-fit:cover; display:block; }
+.detail-photo .diff-badge { top:16px; right:16px; font-size:13px; padding:6px 14px; }
+.detail-body { padding:20px; }
+.detail-title { font-size:22px; font-weight:800; color:var(--text); }
+.detail-loc { font-size:13px; color:var(--text2); margin:4px 0 16px; }
+.quick-stats {
+  background:var(--surface); border-radius:16px; padding:16px;
+  display:flex; justify-content:space-around; margin-bottom:20px; box-shadow:var(--shadow);
+}
+.qs { text-align:center; }
+.qs-val { font-size:15px; font-weight:700; color:var(--text); text-transform:capitalize; }
+.qs-label { font-size:11px; color:var(--text2); margin-top:2px; }
+.qs-divider { width:1px; background:var(--border); }
+.section-title { font-size:16px; font-weight:700; color:var(--text); margin-bottom:12px; margin-top:4px; }
+.badges-wrap { display:flex; flex-wrap:wrap; margin-bottom:16px; }
+.badge {
+  display:flex; align-items:center; gap:5px; padding:6px 10px; border-radius:20px;
+  background:var(--primary-pale); margin-right:8px; margin-bottom:8px;
+  font-size:12px; font-weight:500; color:var(--primary);
+}
+.badge.danger { background:var(--danger-light); color:var(--danger); }
 
-  /* Screens */
-  .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-  .screen.active { display: flex; }
+/* Map embed */
+.map-embed-wrap {
+  border-radius:16px; overflow:hidden; margin-bottom:16px;
+  border:1px solid var(--border); height:200px; position:relative;
+}
+.map-embed-wrap iframe { width:100%; height:100%; border:none; display:block; }
+.map-embed-route {
+  position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none;
+}
+.map-embed-route svg { width:100%; height:100%; }
 
-  /* Scroll area */
-  .scroll { flex: 1; overflow-y: auto; }
-  .scroll::-webkit-scrollbar { display: none; }
+.actions-row { display:flex; gap:12px; margin-bottom:20px; }
+.btn-outline {
+  flex:1; border:1.5px solid var(--primary); border-radius:12px; padding:12px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:14px; font-weight:600; color:var(--primary); background:transparent; cursor:pointer;
+}
+.btn-primary {
+  flex:1; background:var(--primary); border-radius:12px; padding:12px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:14px; font-weight:700; color:white; border:none; cursor:pointer;
+}
+.review-card {
+  background:var(--surface); border-radius:12px; padding:14px;
+  margin-bottom:10px; box-shadow:var(--shadow);
+}
+.review-header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.review-avatar {
+  width:36px; height:36px; border-radius:18px; background:var(--primary);
+  display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:15px;
+}
+.review-name { font-size:14px; font-weight:600; color:var(--text); }
+.review-date { font-size:11px; color:var(--text3); margin-left:auto; }
+.review-text { font-size:14px; color:var(--text2); line-height:1.5; }
 
-  /* Bottom nav */
-  .bottom-nav {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    padding: 8px 0 20px;
-    flex-shrink: 0;
-  }
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    cursor: pointer;
-    padding: 4px 0;
-    color: var(--text3);
-    font-size: 10px;
-    transition: color 0.2s;
-  }
-  .nav-item.active { color: var(--primary); }
-  .nav-item .icon { font-size: 22px; }
-  .nav-add .icon-wrap {
-    width: 50px; height: 50px; border-radius: 25px;
-    background: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    margin-top: -18px;
-    box-shadow: 0 4px 16px rgba(26,92,56,0.4);
-  }
-  .nav-add .icon { font-size: 26px; color: white; }
+/* ── MAP SCREEN ── */
+.map-screen { flex:1; position:relative; overflow:hidden; }
+#leaflet-map { width:100%; height:100%; }
+.map-controls {
+  position:absolute; right:12px; bottom:12px; display:flex;
+  flex-direction:column; gap:8px; z-index:1000;
+}
+.map-ctrl-btn {
+  background:white; border-radius:10px; padding:10px; cursor:pointer;
+  box-shadow:var(--shadow); font-size:18px; text-align:center;
+  border:none; width:42px; height:42px; display:flex; align-items:center; justify-content:center;
+}
+.map-legend {
+  position:absolute; top:12px; left:12px; background:white;
+  border-radius:12px; padding:10px 12px; box-shadow:var(--shadow); z-index:1000;
+}
+.legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text2); margin-bottom:4px; }
+.legend-item:last-child { margin-bottom:0; }
+.legend-dot { width:10px; height:10px; border-radius:5px; }
 
-  /* ── FEED ── */
-  .feed-header {
-    background: var(--surface);
-    padding: 16px 20px 12px;
-  }
-  .feed-header h2 { font-size: 20px; font-weight: 800; color: var(--text); }
-  .feed-header p { font-size: 13px; color: var(--text2); margin-top: 2px; }
+/* ── CREATE ── */
+.create-scroll { flex:1; overflow-y:auto; padding:20px; }
+.create-scroll::-webkit-scrollbar { display:none; }
+.create-title { font-size:24px; font-weight:800; color:var(--text); }
+.create-sub { font-size:14px; color:var(--text2); margin-bottom:24px; }
+.field { margin-bottom:20px; }
+.field label { font-size:13px; font-weight:600; color:var(--text); display:block; margin-bottom:8px; }
+.field input,.field textarea {
+  width:100%; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:12px 14px; font-size:15px; color:var(--text);
+  font-family:inherit; outline:none;
+}
+.field textarea { height:80px; resize:none; }
+.row-fields { display:flex; gap:12px; }
+.segmented { display:flex; gap:8px; }
+.seg-btn {
+  flex:1; padding:10px; border-radius:10px; text-align:center;
+  background:var(--surface); border:1px solid var(--border);
+  font-size:13px; color:var(--text2); cursor:pointer; font-weight:500;
+  text-transform:capitalize; transition:all .2s;
+}
+.seg-btn.active { color:white; font-weight:700; }
+.gps-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; }
+.gps-btn {
+  background:var(--primary); color:white; border:none; border-radius:12px;
+  padding:12px; width:100%; display:flex; align-items:center; justify-content:center;
+  gap:8px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:14px;
+}
+.gps-stats { display:flex; justify-content:space-around; }
+.gps-stat { text-align:center; }
+.gps-stat-val { font-size:18px; font-weight:700; color:var(--text); }
+.gps-stat-label { font-size:11px; color:var(--text2); }
+.toggle-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0; border-bottom:1px solid var(--border); font-size:14px; color:var(--text);
+}
+.toggle {
+  width:44px; height:26px; border-radius:13px; background:var(--border);
+  position:relative; cursor:pointer; transition:background .2s; flex-shrink:0;
+}
+.toggle.on { background:var(--primary); }
+.toggle::after {
+  content:''; position:absolute; width:20px; height:20px; border-radius:10px;
+  background:white; top:3px; left:3px; transition:left .2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle.on::after { left:21px; }
+.photos-row { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; }
+.photos-row::-webkit-scrollbar { display:none; }
+.photo-add {
+  width:90px; height:90px; border-radius:10px; flex-shrink:0;
+  border:2px dashed var(--primary); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:4px;
+  font-size:11px; color:var(--primary); font-weight:600; cursor:pointer;
+}
+.photo-thumb-wrap { position:relative; flex-shrink:0; }
+.photo-thumb { width:90px; height:90px; border-radius:10px; object-fit:cover; display:block; }
+.photo-remove {
+  position:absolute; top:-6px; right:-6px; background:var(--danger);
+  color:white; border-radius:50%; width:20px; height:20px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; cursor:pointer; border:2px solid white;
+}
+.submit-btn {
+  background:var(--primary); color:white; border:none; border-radius:14px;
+  padding:16px; width:100%; font-size:16px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px;
+}
+.saved-list { padding:0 20px 20px; display:flex; flex-direction:column; gap:12px; }
+.saved-item {
+  background:var(--surface); border-radius:12px; padding:14px;
+  box-shadow:var(--shadow); display:flex; gap:12px; align-items:center;
+}
+.saved-item img { width:60px; height:60px; border-radius:10px; object-fit:cover; flex-shrink:0; }
+.saved-item-info .saved-name { font-size:14px; font-weight:700; color:var(--text); }
+.saved-item-info .saved-sub { font-size:12px; color:var(--text2); margin-top:2px; }
+.empty-state { text-align:center; padding:60px 20px; color:var(--text3); }
+.empty-state .empty-icon { font-size:48px; margin-bottom:12px; }
+.empty-state p { font-size:14px; }
 
-  .search-bar {
-    margin: 12px 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 11px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text3);
-    font-size: 14px;
-  }
+/* ── PROFILE ── */
+.profile-header { background:var(--surface); padding:20px; display:flex; align-items:center; gap:14px; }
+.profile-avatar {
+  width:64px; height:64px; border-radius:32px; background:var(--primary);
+  display:flex; align-items:center; justify-content:center; color:white; font-size:22px; font-weight:700;
+}
+.profile-name { font-size:18px; font-weight:700; color:var(--text); }
+.profile-level { font-size:13px; color:var(--text2); margin-top:2px; }
+.stats-row {
+  background:var(--surface); display:flex; padding:16px 0; margin-bottom:2px;
+  justify-content:space-evenly; border-bottom:1px solid var(--border);
+}
+.stat-box { text-align:center; }
+.stat-val { font-size:20px; font-weight:700; color:var(--text); }
+.stat-label { font-size:12px; color:var(--text2); margin-top:2px; }
+.stat-div { width:1px; background:var(--border); }
+.profile-tabs { display:flex; background:var(--surface); border-bottom:1px solid var(--border); margin-bottom:0; }
+.profile-tab {
+  flex:1; padding:14px; text-align:center; font-size:14px; color:var(--text2);
+  font-weight:500; cursor:pointer; border-bottom:2px solid transparent;
+}
+.profile-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:700; }
 
-  .filter-row {
-    display: flex;
-    gap: 8px;
-    padding: 0 20px 12px;
-    overflow-x: auto;
-  }
-  .filter-row::-webkit-scrollbar { display: none; }
-  .chip {
-    white-space: nowrap;
-    padding: 7px 16px;
-    border-radius: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--text2);
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
-  }
-  .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+/* ── AUTH ── */
+.auth-wrap { padding:0 24px; }
+.auth-logo { text-align:center; padding:40px 0 32px; }
+.auth-logo-icon {
+  width:76px; height:76px; border-radius:24px; background:var(--primary);
+  display:inline-flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:16px;
+}
+.auth-logo h1 { font-size:28px; font-weight:800; color:var(--text); }
+.auth-logo p { font-size:14px; color:var(--text2); margin-top:4px; }
+.auth-tabs {
+  display:flex; background:var(--border); border-radius:12px;
+  padding:4px; margin-bottom:24px;
+}
+.auth-tab {
+  flex:1; padding:10px; border-radius:10px; text-align:center;
+  font-size:14px; color:var(--text2); font-weight:500; cursor:pointer;
+}
+.auth-tab.active { background:white; color:var(--text); font-weight:700; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.auth-submit {
+  background:var(--primary); color:white; border:none; border-radius:14px;
+  padding:16px; font-size:16px; font-weight:700; cursor:pointer; width:100%; margin-top:8px;
+}
+.auth-skip { text-align:center; color:var(--text2); font-size:14px; padding:20px; cursor:pointer; }
 
-  .trail-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 16px; }
-
-  .trail-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    cursor: pointer;
-    transition: transform 0.15s;
-  }
-  .trail-card:active { transform: scale(0.98); }
-  .trail-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
-  .card-img-wrap { position: relative; }
-  .diff-badge {
-    position: absolute;
-    top: 12px; right: 12px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: capitalize;
-  }
-  .card-body { padding: 14px; }
-  .card-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .card-loc { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
-  .card-stats { display: flex; gap: 14px; margin-bottom: 10px; }
-  .card-stat { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text2); }
-  .card-attrs { display: flex; gap: 6px; }
-  .attr-icon {
-    background: var(--primary-pale);
-    border-radius: 6px;
-    padding: 4px 6px;
-    font-size: 13px;
-  }
-  .attr-icon.danger { background: var(--danger-light); }
-
-  /* ── DETAIL ── */
-  .detail-photo { position: relative; }
-  .detail-photo img { width: 100%; height: 240px; object-fit: cover; display: block; }
-  .detail-photo .diff-badge { top: 16px; right: 16px; font-size: 13px; padding: 6px 14px; }
-  .detail-body { padding: 20px; }
-  .detail-title { font-size: 22px; font-weight: 800; color: var(--text); }
-  .detail-loc { font-size: 13px; color: var(--text2); margin: 4px 0 16px; }
-
-  .quick-stats {
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow);
-  }
-  .qs { text-align: center; }
-  .qs-val { font-size: 15px; font-weight: 700; color: var(--text); text-transform: capitalize; }
-  .qs-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
-  .qs-divider { width: 1px; background: var(--border); }
-
-  .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
-
-  .badges-wrap { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 16px; }
-  .badge {
-    display: flex; align-items: center; gap: 5px;
-    padding: 6px 10px; border-radius: 20px;
-    background: var(--primary-pale);
-    margin-right: 8px; margin-bottom: 8px;
-    font-size: 12px; font-weight: 500; color: var(--primary);
-  }
-  .badge.danger { background: var(--danger-light); color: var(--danger); }
-
-  .map-placeholder {
-    background: #c8d6c8;
-    border-radius: 16px;
-    height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-    font-size: 13px;
-    color: var(--primary);
-    font-weight: 600;
-    gap: 8px;
-    border: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  .map-placeholder::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: 
-      repeating-linear-gradient(0deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 1px, transparent 1px, transparent 40px),
-      repeating-linear-gradient(90deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 1px, transparent 1px, transparent 40px);
-  }
-  .map-route {
-    position: absolute;
-    top: 40px; left: 30px; right: 30px; bottom: 40px;
-  }
-  .map-route svg { width: 100%; height: 100%; }
-
-  .actions-row { display: flex; gap: 12px; margin-bottom: 20px; }
-  .btn-outline {
-    flex: 1; border: 1.5px solid var(--primary); border-radius: 12px;
-    padding: 12px; display: flex; align-items: center; justify-content: center;
-    gap: 8px; font-size: 14px; font-weight: 600; color: var(--primary);
-    background: transparent; cursor: pointer;
-  }
-  .btn-primary {
-    flex: 1; background: var(--primary); border-radius: 12px;
-    padding: 12px; display: flex; align-items: center; justify-content: center;
-    gap: 8px; font-size: 14px; font-weight: 700; color: white;
-    border: none; cursor: pointer;
-  }
-
-  .review-card {
-    background: var(--surface);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-  }
-  .review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .review-avatar {
-    width: 36px; height: 36px; border-radius: 18px;
-    background: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-weight: 700; font-size: 15px;
-  }
-  .review-name { font-size: 14px; font-weight: 600; color: var(--text); }
-  .stars { color: var(--accent); font-size: 13px; }
-  .review-date { font-size: 11px; color: var(--text3); margin-left: auto; }
-  .review-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
-
-  /* ── MAP SCREEN ── */
-  .map-screen-container {
-    flex: 1;
-    background: #c8d6c8;
-    position: relative;
-    overflow: hidden;
-  }
-  .map-screen-container svg { width: 100%; height: 100%; }
-  .map-layer-btn {
-    position: absolute; right: 16px; bottom: 16px;
-    background: white; border-radius: 12px; padding: 10px;
-    box-shadow: var(--shadow); font-size: 20px; cursor: pointer;
-  }
-  .map-legend {
-    position: absolute; top: 16px; left: 16px;
-    background: white; border-radius: 12px; padding: 10px 12px;
-    box-shadow: var(--shadow);
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 5px; }
-  .map-trail-preview {
-    position: absolute; bottom: 16px; left: 16px; right: 56px;
-    background: white; border-radius: 16px; padding: 14px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  }
-  .map-trail-preview h4 { font-size: 15px; font-weight: 700; color: var(--text); }
-  .map-trail-preview p { font-size: 12px; color: var(--text2); margin: 4px 0 10px; text-transform: capitalize; }
-
-  /* ── CREATE ── */
-  .create-scroll { flex: 1; overflow-y: auto; padding: 20px; }
-  .create-scroll::-webkit-scrollbar { display: none; }
-  .create-title { font-size: 24px; font-weight: 800; color: var(--text); }
-  .create-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
-  .field { margin-bottom: 20px; }
-  .field label { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 8px; }
-  .field input, .field textarea {
-    width: 100%; background: var(--surface);
-    border: 1px solid var(--border); border-radius: 12px;
-    padding: 12px 14px; font-size: 15px; color: var(--text);
-    font-family: inherit; outline: none;
-  }
-  .field textarea { height: 80px; resize: none; }
-  .segmented { display: flex; gap: 8px; }
-  .seg-btn {
-    flex: 1; padding: 10px; border-radius: 10px; text-align: center;
-    background: var(--surface); border: 1px solid var(--border);
-    font-size: 13px; color: var(--text2); cursor: pointer; font-weight: 500;
-    text-transform: capitalize; transition: all 0.2s;
-  }
-  .seg-btn.active { color: white; font-weight: 700; border-color: transparent; }
-  .gps-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 16px;
-  }
-  .gps-btn {
-    background: var(--primary); color: white; border: none;
-    border-radius: 12px; padding: 12px; width: 100%;
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px; font-size: 14px; font-weight: 700;
-    cursor: pointer; margin-bottom: 14px;
-  }
-  .gps-stats { display: flex; justify-content: space-around; }
-  .gps-stat { text-align: center; }
-  .gps-stat-val { font-size: 18px; font-weight: 700; color: var(--text); }
-  .gps-stat-label { font-size: 11px; color: var(--text2); }
-  .toggle-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0; border-bottom: 1px solid var(--border);
-    font-size: 14px; color: var(--text);
-  }
-  .toggle {
-    width: 44px; height: 26px; border-radius: 13px;
-    background: var(--border); position: relative; cursor: pointer;
-    transition: background 0.2s;
-  }
-  .toggle.on { background: var(--primary); }
-  .toggle::after {
-    content: ''; position: absolute;
-    width: 20px; height: 20px; border-radius: 10px;
-    background: white; top: 3px; left: 3px;
-    transition: left 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-  }
-  .toggle.on::after { left: 21px; }
-  .photos-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
-  .photos-row::-webkit-scrollbar { display: none; }
-  .photo-thumb {
-    width: 90px; height: 90px; border-radius: 10px;
-    object-fit: cover; flex-shrink: 0;
-  }
-  .photo-add {
-    width: 90px; height: 90px; border-radius: 10px; flex-shrink: 0;
-    border: 2px dashed var(--primary);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 4px; font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer;
-  }
-  .submit-btn {
-    background: var(--primary); color: white; border: none;
-    border-radius: 14px; padding: 16px; width: 100%;
-    font-size: 16px; font-weight: 700; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    margin-top: 10px;
-  }
-
-  /* ── PROFILE ── */
-  .profile-header {
-    background: var(--surface);
-    padding: 20px;
-    display: flex; align-items: center; gap: 14px;
-  }
-  .profile-avatar {
-    width: 64px; height: 64px; border-radius: 32px;
-    background: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 22px; font-weight: 700;
-  }
-  .profile-name { font-size: 18px; font-weight: 700; color: var(--text); }
-  .profile-level { font-size: 13px; color: var(--text2); margin-top: 2px; }
-  .stats-row {
-    background: var(--surface); display: flex;
-    padding: 16px 0; margin-bottom: 2px; justify-content: space-evenly;
-    border-bottom: 1px solid var(--border);
-  }
-  .stat-box { text-align: center; }
-  .stat-val { font-size: 20px; font-weight: 700; color: var(--text); }
-  .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .stat-div { width: 1px; background: var(--border); }
-  .profile-tabs {
-    display: flex; background: var(--surface);
-    border-bottom: 1px solid var(--border); margin-bottom: 16px;
-  }
-  .profile-tab {
-    flex: 1; padding: 14px; text-align: center;
-    font-size: 14px; color: var(--text2); font-weight: 500;
-    cursor: pointer; border-bottom: 2px solid transparent;
-  }
-  .profile-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
-
-  /* ── AUTH ── */
-  .auth-logo { text-align: center; padding: 40px 24px 32px; }
-  .auth-logo-icon {
-    width: 76px; height: 76px; border-radius: 24px;
-    background: var(--primary); display: inline-flex;
-    align-items: center; justify-content: center;
-    font-size: 36px; margin-bottom: 16px;
-  }
-  .auth-logo h1 { font-size: 28px; font-weight: 800; color: var(--text); }
-  .auth-logo p { font-size: 14px; color: var(--text2); margin-top: 4px; }
-  .auth-tabs {
-    display: flex; background: var(--border);
-    border-radius: 12px; padding: 4px; margin: 0 24px 24px;
-  }
-  .auth-tab {
-    flex: 1; padding: 10px; border-radius: 10px; text-align: center;
-    font-size: 14px; color: var(--text2); font-weight: 500; cursor: pointer;
-  }
-  .auth-tab.active { background: white; color: var(--text); font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-  .auth-form { padding: 0 24px; display: flex; flex-direction: column; gap: 16px; }
-  .auth-submit {
-    background: var(--primary); color: white; border: none;
-    border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 700;
-    cursor: pointer; margin-top: 8px;
-  }
-  .auth-skip { text-align: center; color: var(--text2); font-size: 14px; padding: 20px; cursor: pointer; }
-
-  /* Rating */
-  .rating-row { display: flex; gap: 2px; }
-  .star { color: var(--accent); font-size: 16px; }
-  .star.empty { color: var(--border); }
-
-  /* Hover effects */
-  .trail-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-  .chip:hover { background: var(--primary-pale); }
-  button:hover { opacity: 0.9; }
+/* Toast */
+.toast {
+  position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:#1A202C; color:white; padding:12px 24px; border-radius:30px;
+  font-size:13px; font-weight:600; opacity:0; transition:all .3s; z-index:9999;
+  white-space:nowrap; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
+
+<!-- Leaflet para mapa real interativo -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
 <div class="phone">
-  <!-- Status bar -->
   <div class="status-bar">
-    <span class="time">09:41</span>
-    <div class="status-icons">
-      <span>📶</span><span>🔋</span>
-    </div>
+    <span class="time" id="clock">09:41</span>
+    <div class="status-icons"><span>📶</span><span>🔋</span></div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SCREEN: FEED
-  ══════════════════════════════════════════ -->
+  <!-- ══════════ FEED ══════════ -->
   <div class="screen active" id="screen-feed">
     <div class="scroll">
       <div class="feed-header">
@@ -481,228 +348,139 @@
       </div>
 
       <div class="search-bar">
-        🔍 <span>Buscar trilhas, cidades...</span>
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Buscar trilhas, cidades..." oninput="applyFilters()">
+        <span class="search-clear" id="search-clear" onclick="clearSearch()">✕</span>
       </div>
 
-      <div class="filter-row">
-        <div class="chip active" onclick="setFilter(this,'all')">Todas</div>
-        <div class="chip" onclick="setFilter(this,'fácil')">Fácil</div>
-        <div class="chip" onclick="setFilter(this,'moderada')">Moderada</div>
-        <div class="chip" onclick="setFilter(this,'difícil')">Difícil</div>
-        <div class="chip" onclick="setFilter(this,'parking')">🅿️ Estacionamento</div>
-        <div class="chip" onclick="setFilter(this,'waterfall')">💧 Cachoeiras</div>
-        <div class="chip" onclick="setFilter(this,'camping')">⛺ Acampamento</div>
+      <div class="filter-row" id="filter-row">
+        <div class="chip active" data-filter="all"    onclick="setFilter(this)">Todas</div>
+        <div class="chip"        data-filter="fácil"  onclick="setFilter(this)">Fácil</div>
+        <div class="chip"        data-filter="moderada" onclick="setFilter(this)">Moderada</div>
+        <div class="chip"        data-filter="difícil" onclick="setFilter(this)">Difícil</div>
+        <div class="chip"        data-filter="parking" onclick="setFilter(this)">🅿️ Estacionamento</div>
+        <div class="chip"        data-filter="waterfall" onclick="setFilter(this)">💧 Cachoeiras</div>
+        <div class="chip"        data-filter="camping" onclick="setFilter(this)">⛺ Acampamento</div>
       </div>
 
-      <div class="trail-list">
-        <!-- Card 1 -->
-        <div class="trail-card" onclick="openDetail(0)">
-          <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80" alt="Pedra do Baú">
-            <div class="diff-badge" style="background:#E53E3E">difícil</div>
-          </div>
-          <div class="card-body">
-            <div class="card-name">Trilha da Pedra do Baú</div>
-            <div class="card-loc">📍 São Bento do Sapucaí, SP</div>
-            <div class="card-stats">
-              <div class="card-stat">🗺️ 12,5 km</div>
-              <div class="card-stat">⏱️ 5h</div>
-              <div class="card-stat">⭐ 4,8 (23)</div>
-            </div>
-            <div class="card-attrs">
-              <div class="attr-icon">🚗</div>
-              <div class="attr-icon">💧</div>
-              <div class="attr-icon danger">📵</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="trail-card" onclick="openDetail(1)">
-          <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80" alt="Aiuruoca">
-            <div class="diff-badge" style="background:#38A169">fácil</div>
-          </div>
-          <div class="card-body">
-            <div class="card-name">Circuito das Cachoeiras de Aiuruoca</div>
-            <div class="card-loc">📍 Aiuruoca, MG</div>
-            <div class="card-stats">
-              <div class="card-stat">🗺️ 6,2 km</div>
-              <div class="card-stat">⏱️ 2h30</div>
-              <div class="card-stat">⭐ 4,6 (41)</div>
-            </div>
-            <div class="card-attrs">
-              <div class="attr-icon">🚗</div>
-              <div class="attr-icon">💧</div>
-              <div class="attr-icon">⛺</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="trail-card" onclick="openDetail(2)">
-          <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80" alt="Serra dos Órgãos">
-            <div class="diff-badge" style="background:#E53E3E">difícil</div>
-          </div>
-          <div class="card-body">
-            <div class="card-name">Travessia Serra dos Órgãos</div>
-            <div class="card-loc">📍 Teresópolis, RJ</div>
-            <div class="card-stats">
-              <div class="card-stat">🗺️ 42 km</div>
-              <div class="card-stat">⏱️ 2 dias</div>
-              <div class="card-stat">⭐ 4,9 (87)</div>
-            </div>
-            <div class="card-attrs">
-              <div class="attr-icon">🚗</div>
-              <div class="attr-icon">💧</div>
-              <div class="attr-icon">⛺</div>
-              <div class="attr-icon">🧗</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="trail-list" id="trail-list"></div>
+      <div class="no-results" id="no-results">🥾 Nenhuma trilha encontrada com esses filtros.</div>
     </div>
-    <div class="bottom-nav" id="nav-feed">
+    <div class="bottom-nav">
       <div class="nav-item active" onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
-      <div class="nav-item" onclick="goTo('search')"><span class="icon">🔍</span>Buscar</div>
+      <div class="nav-item"        onclick="goTo('search-screen')"><span class="icon">🔍</span>Buscar</div>
       <div class="nav-item nav-add" onclick="goTo('create')"><div class="icon-wrap"><span class="icon">＋</span></div></div>
-      <div class="nav-item" onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
-      <div class="nav-item" onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
+      <div class="nav-item"        onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
+      <div class="nav-item"        onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SCREEN: DETAIL
-  ══════════════════════════════════════════ -->
+  <!-- ══════════ SEARCH SCREEN ══════════ -->
+  <div class="screen" id="screen-search-screen">
+    <div class="scroll">
+      <div class="feed-header"><h2>🔍 Buscar Trilhas</h2></div>
+      <div class="search-bar" style="margin-top:0">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input2" placeholder="Nome, cidade, estado..." oninput="applySearch2()">
+        <span class="search-clear" id="search-clear2" onclick="clearSearch2()">✕</span>
+      </div>
+      <div class="filter-row">
+        <div class="chip active" data-filter2="all"      onclick="setFilter2(this)">Todas</div>
+        <div class="chip"        data-filter2="fácil"    onclick="setFilter2(this)">Fácil</div>
+        <div class="chip"        data-filter2="moderada" onclick="setFilter2(this)">Moderada</div>
+        <div class="chip"        data-filter2="difícil"  onclick="setFilter2(this)">Difícil</div>
+      </div>
+      <div class="trail-list" id="search-list"></div>
+      <div class="no-results" id="no-results2">🥾 Nenhuma trilha encontrada.</div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item"        onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
+      <div class="nav-item active" onclick="goTo('search-screen')"><span class="icon">🔍</span>Buscar</div>
+      <div class="nav-item nav-add" onclick="goTo('create')"><div class="icon-wrap"><span class="icon">＋</span></div></div>
+      <div class="nav-item"        onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
+      <div class="nav-item"        onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- ══════════ DETAIL ══════════ -->
   <div class="screen" id="screen-detail">
     <div class="scroll">
       <div class="detail-photo">
-        <img id="detail-img" src="" alt="">
-        <div id="detail-diff" class="diff-badge"></div>
+        <img id="d-img" src="" alt="">
+        <div id="d-diff" class="diff-badge"></div>
       </div>
       <div class="detail-body">
-        <div id="detail-title" class="detail-title"></div>
-        <div id="detail-loc" class="detail-loc"></div>
-
+        <div id="d-title" class="detail-title"></div>
+        <div id="d-loc"   class="detail-loc"></div>
         <div class="quick-stats">
-          <div class="qs"><div id="qs-dist" class="qs-val"></div><div class="qs-label">Distância</div></div>
+          <div class="qs"><div id="d-dist"    class="qs-val"></div><div class="qs-label">Distância</div></div>
           <div class="qs-divider"></div>
-          <div class="qs"><div id="qs-dur" class="qs-val"></div><div class="qs-label">Duração</div></div>
+          <div class="qs"><div id="d-dur"     class="qs-val"></div><div class="qs-label">Duração</div></div>
           <div class="qs-divider"></div>
-          <div class="qs"><div id="qs-terrain" class="qs-val"></div><div class="qs-label">Terreno</div></div>
+          <div class="qs"><div id="d-terrain" class="qs-val"></div><div class="qs-label">Terreno</div></div>
         </div>
-
         <div class="section-title">Características</div>
-        <div id="detail-badges" class="badges-wrap"></div>
-
+        <div id="d-badges" class="badges-wrap"></div>
         <div class="section-title">Mapa da Trilha</div>
-        <div class="map-placeholder">
-          <div class="map-route">
-            <svg viewBox="0 0 300 120" fill="none">
-              <path d="M20,100 C60,80 80,40 120,30 C160,20 180,60 220,50 C250,42 270,20 290,10" stroke="#1A5C38" stroke-width="3" stroke-linecap="round" fill="none"/>
-              <circle cx="20" cy="100" r="6" fill="#1A5C38"/>
-              <circle cx="290" cy="10" r="6" fill="#F4A228"/>
-              <circle cx="120" cy="30" r="5" fill="#3182CE"/>
-              <circle cx="180" cy="55" r="8" fill="#E53E3E" opacity="0.8"/>
-            </svg>
-          </div>
-          <span style="position:relative;z-index:1;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:8px;">🗺️ Rota GPS</span>
-        </div>
-
+        <div class="map-embed-wrap"><div id="detail-map"></div></div>
         <div class="actions-row">
-          <button class="btn-outline" onclick="alert('Trilha salva para uso offline! ✅')">📥 Salvar offline</button>
-          <button class="btn-primary" onclick="goTo('review')">⭐ Avaliar</button>
+          <button class="btn-outline" onclick="saveOffline()">📥 Salvar offline</button>
+          <button class="btn-primary"  onclick="goTo('review')">⭐ Avaliar</button>
         </div>
-
         <div class="section-title">Avaliações</div>
-        <div id="detail-reviews"></div>
+        <div id="d-reviews"></div>
       </div>
     </div>
-    <div style="background:var(--surface);padding:12px 20px 20px;border-top:1px solid var(--border)">
-      <button class="btn-outline" style="width:100%" onclick="goTo('feed')">← Voltar ao Feed</button>
+    <div style="background:var(--surface);padding:12px 20px 20px;border-top:1px solid var(--border);flex-shrink:0">
+      <button class="btn-outline" style="width:100%" onclick="history.back()">← Voltar</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SCREEN: MAP
-  ══════════════════════════════════════════ -->
+  <!-- ══════════ MAP ══════════ -->
   <div class="screen" id="screen-map">
-    <div class="map-screen-container">
-      <svg viewBox="0 0 390 680" xmlns="http://www.w3.org/2000/svg">
-        <!-- Fundo mapa -->
-        <rect width="390" height="680" fill="#c8d6c8"/>
-        <!-- Grade -->
-        <g stroke="rgba(255,255,255,0.3)" stroke-width="0.5">
-          <line x1="0" y1="80" x2="390" y2="80"/>
-          <line x1="0" y1="160" x2="390" y2="160"/>
-          <line x1="0" y1="240" x2="390" y2="240"/>
-          <line x1="0" y1="320" x2="390" y2="320"/>
-          <line x1="0" y1="400" x2="390" y2="400"/>
-          <line x1="0" y1="480" x2="390" y2="480"/>
-          <line x1="0" y1="560" x2="390" y2="560"/>
-          <line x1="80" y1="0" x2="80" y2="680"/>
-          <line x1="160" y1="0" x2="160" y2="680"/>
-          <line x1="240" y1="0" x2="240" y2="680"/>
-          <line x1="320" y1="0" x2="320" y2="680"/>
-        </g>
-        <!-- Estradas -->
-        <path d="M0,340 Q195,300 390,340" stroke="white" stroke-width="6" fill="none" opacity="0.6"/>
-        <path d="M195,0 Q220,340 195,680" stroke="white" stroke-width="4" fill="none" opacity="0.5"/>
-        <!-- Marcadores trilhas -->
-        <circle cx="150" cy="200" r="18" fill="#E53E3E" stroke="white" stroke-width="2"/>
-        <text x="150" y="206" text-anchor="middle" font-size="14">🥾</text>
-        <circle cx="260" cy="320" r="18" fill="#38A169" stroke="white" stroke-width="2"/>
-        <text x="260" y="326" text-anchor="middle" font-size="14">🥾</text>
-        <circle cx="100" cy="450" r="18" fill="#E53E3E" stroke="white" stroke-width="2"/>
-        <text x="100" y="456" text-anchor="middle" font-size="14">🥾</text>
-        <!-- Localização usuário -->
-        <circle cx="195" cy="380" r="12" fill="#1A5C38" stroke="white" stroke-width="2"/>
-        <circle cx="195" cy="380" r="20" fill="#1A5C38" fill-opacity="0.2"/>
-      </svg>
-
+    <div class="map-screen">
+      <div id="leaflet-map"></div>
       <div class="map-legend">
         <div class="legend-item"><div class="legend-dot" style="background:#E53E3E"></div>Difícil</div>
         <div class="legend-item"><div class="legend-dot" style="background:#F4A228"></div>Moderada</div>
         <div class="legend-item"><div class="legend-dot" style="background:#38A169"></div>Fácil</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E53E3E;opacity:.5"></div>⚠️ Perigo</div>
       </div>
-
-      <div class="map-layer-btn" onclick="alert('Camadas: Padrão → Satélite → Terreno')">🗂️</div>
-
-      <div class="map-trail-preview">
-        <h4>Circuito das Cachoeiras de Aiuruoca</h4>
-        <p>Aiuruoca, MG · 6,2 km · fácil</p>
-        <button class="btn-primary" style="font-size:13px;padding:8px" onclick="openDetail(1);goTo('detail')">Ver trilha →</button>
+      <div class="map-controls">
+        <button class="map-ctrl-btn" onclick="toggleMapStyle()" title="Alternar camada">🗂️</button>
+        <button class="map-ctrl-btn" onclick="centerMap()" title="Minha localização">📍</button>
       </div>
     </div>
     <div class="bottom-nav">
-      <div class="nav-item" onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
-      <div class="nav-item" onclick="goTo('search')"><span class="icon">🔍</span>Buscar</div>
+      <div class="nav-item"        onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
+      <div class="nav-item"        onclick="goTo('search-screen')"><span class="icon">🔍</span>Buscar</div>
       <div class="nav-item nav-add" onclick="goTo('create')"><div class="icon-wrap"><span class="icon">＋</span></div></div>
-      <div class="nav-item active" onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
-      <div class="nav-item" onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
+      <div class="nav-item active"  onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
+      <div class="nav-item"         onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SCREEN: CREATE
-  ══════════════════════════════════════════ -->
+  <!-- ══════════ CREATE ══════════ -->
   <div class="screen" id="screen-create">
-    <div class="create-scroll">
+    <div class="create-scroll" id="create-scroll">
       <div class="create-title">Nova Trilha</div>
       <div class="create-sub">Registre um percurso que você já fez</div>
 
       <div class="field">
         <label>Nome da trilha *</label>
-        <input type="text" placeholder="Ex: Trilha da Pedra do Baú">
+        <input type="text" id="f-name" placeholder="Ex: Trilha da Pedra do Baú">
       </div>
       <div class="field">
         <label>Descrição</label>
-        <textarea placeholder="Descreva a trilha, pontos de destaque..."></textarea>
+        <textarea id="f-desc" placeholder="Descreva a trilha, pontos de destaque..."></textarea>
       </div>
-      <div style="display:flex;gap:12px">
-        <div class="field" style="flex:1"><label>Cidade</label><input type="text" placeholder="Cidade"></div>
-        <div class="field" style="width:70px"><label>UF</label><input type="text" placeholder="SP" maxlength="2"></div>
+      <div class="row-fields">
+        <div class="field" style="flex:1"><label>Cidade</label><input type="text" id="f-city" placeholder="Cidade"></div>
+        <div class="field" style="width:70px"><label>UF</label><input type="text" id="f-uf" placeholder="SP" maxlength="2"></div>
+      </div>
+      <div class="field">
+        <label>Distância (km) *</label>
+        <input type="number" id="f-dist" placeholder="Ex: 12.5" min="0" step="0.1">
       </div>
 
       <div class="field">
@@ -721,347 +499,765 @@
 
       <div class="field">
         <label>Dificuldade *</label>
-        <div class="segmented">
-          <div class="seg-btn active" style="background:#38A169;border-color:#38A169;color:white" onclick="setDiff(this,'fácil','#38A169')">fácil</div>
-          <div class="seg-btn" onclick="setDiff(this,'moderada','#F4A228')">moderada</div>
-          <div class="seg-btn" onclick="setDiff(this,'difícil','#E53E3E')">difícil</div>
+        <div class="segmented" id="seg-diff">
+          <div class="seg-btn active" data-val="fácil"    style="background:#38A169;color:white;border-color:#38A169" onclick="pickSeg('seg-diff',this,'#38A169')">fácil</div>
+          <div class="seg-btn"        data-val="moderada" onclick="pickSeg('seg-diff',this,'#F4A228')">moderada</div>
+          <div class="seg-btn"        data-val="difícil"  onclick="pickSeg('seg-diff',this,'#E53E3E')">difícil</div>
         </div>
       </div>
 
       <div class="field">
         <label>Tipo de terreno</label>
-        <div class="segmented">
-          <div class="seg-btn" onclick="setSeg(this)">íngreme</div>
-          <div class="seg-btn active" style="background:var(--primary);color:white;border-color:var(--primary)" onclick="setSeg(this)">mesclado</div>
-          <div class="seg-btn" onclick="setSeg(this)">plano</div>
+        <div class="segmented" id="seg-terrain">
+          <div class="seg-btn"        data-val="íngreme"  onclick="pickSeg('seg-terrain',this,'var(--primary)')">íngreme</div>
+          <div class="seg-btn active" data-val="mesclado" style="background:var(--primary);color:white;border-color:var(--primary)" onclick="pickSeg('seg-terrain',this,'var(--primary)')">mesclado</div>
+          <div class="seg-btn"        data-val="plano"    onclick="pickSeg('seg-terrain',this,'var(--primary)')">plano</div>
         </div>
       </div>
 
       <div class="field">
-        <label>Fotos da trilha (0/20)</label>
-        <div class="photos-row">
-          <div class="photo-add">📷<span>Adicionar</span></div>
-          <div class="photo-add">📷<span>Adicionar</span></div>
+        <label>Fotos da trilha (<span id="photo-count">0</span>/20)</label>
+        <div class="photos-row" id="photos-row">
+          <div class="photo-add" onclick="addPhoto()">📷<span>Adicionar</span></div>
         </div>
       </div>
 
       <div class="field">
         <label>Características</label>
-        <div class="toggle-row">Estacionamento disponível <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row">Sinal de celular <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row">Possui cachoeira <div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row">Área de acampamento <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row">Travessia de rios/riachos <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row">Requer escalada <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">🅿️ Estacionamento<div class="toggle" id="t-parking" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">📶 Sinal de celular<div class="toggle" id="t-signal"  onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">💧 Possui cachoeira<div class="toggle on" id="t-waterfall" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">⛺ Área de acampamento<div class="toggle" id="t-camping" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">🌊 Travessia de rios<div class="toggle" id="t-river"  onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">🧗 Requer escalada<div class="toggle" id="t-climb"   onclick="this.classList.toggle('on')"></div></div>
       </div>
 
       <div class="field">
         <label>Meios de acesso</label>
-        <div class="toggle-row">🚗 Carro <div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row">🏍️ Moto <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-        <div class="toggle-row">🚲 Bicicleta <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">🚗 Carro<div class="toggle on" id="t-car"  onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">🏍️ Moto<div class="toggle"    id="t-moto" onclick="this.classList.toggle('on')"></div></div>
+        <div class="toggle-row">🚲 Bicicleta<div class="toggle" id="t-bike" onclick="this.classList.toggle('on')"></div></div>
       </div>
 
-      <button class="submit-btn" onclick="alert('Trilha publicada com sucesso! ✅')">
-        ☁️ Publicar trilha
-      </button>
+      <div class="field">
+        <label>Melhores épocas</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="seasons-wrap">
+          <div class="chip" data-season="verão"     onclick="toggleSeason(this)">Verão</div>
+          <div class="chip" data-season="outono"    onclick="toggleSeason(this)">Outono</div>
+          <div class="chip" data-season="inverno"   onclick="toggleSeason(this)">Inverno</div>
+          <div class="chip" data-season="primavera" onclick="toggleSeason(this)">Primavera</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Fauna e flora notáveis</label>
+        <input type="text" id="f-fauna" placeholder="Ex: Araras, orquídeas..." maxlength="300">
+      </div>
+
+      <button class="submit-btn" onclick="submitTrail()">☁️ Publicar trilha</button>
+      <div style="height:20px"></div>
     </div>
     <div class="bottom-nav">
-      <div class="nav-item" onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
-      <div class="nav-item" onclick="goTo('search')"><span class="icon">🔍</span>Buscar</div>
+      <div class="nav-item"         onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
+      <div class="nav-item"         onclick="goTo('search-screen')"><span class="icon">🔍</span>Buscar</div>
       <div class="nav-item nav-add active" onclick="goTo('create')"><div class="icon-wrap"><span class="icon">＋</span></div></div>
-      <div class="nav-item" onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
-      <div class="nav-item" onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
+      <div class="nav-item"         onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
+      <div class="nav-item"         onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SCREEN: PROFILE
-  ══════════════════════════════════════════ -->
+  <!-- ══════════ PROFILE ══════════ -->
   <div class="screen" id="screen-profile">
     <div class="scroll">
       <div class="profile-header">
-        <div class="profile-avatar">MC</div>
+        <div class="profile-avatar" id="prof-avatar">?</div>
         <div>
-          <div class="profile-name">Marina Castro</div>
-          <div class="profile-level">🧭 Exploradora · Serra do Vale</div>
+          <div class="profile-name" id="prof-name">Faça login</div>
+          <div class="profile-level" id="prof-level">🌱 Iniciante</div>
         </div>
+        <div style="margin-left:auto;cursor:pointer;font-size:20px" onclick="goTo('auth')" title="Login">🔑</div>
       </div>
       <div class="stats-row">
-        <div class="stat-box"><div class="stat-val">14</div><div class="stat-label">Trilhas</div></div>
+        <div class="stat-box"><div class="stat-val" id="prof-trails">0</div><div class="stat-label">Trilhas</div></div>
         <div class="stat-div"></div>
-        <div class="stat-box"><div class="stat-val">312</div><div class="stat-label">Seguidores</div></div>
+        <div class="stat-box"><div class="stat-val">0</div><div class="stat-label">Seguidores</div></div>
         <div class="stat-div"></div>
-        <div class="stat-box"><div class="stat-val">98</div><div class="stat-label">Seguindo</div></div>
+        <div class="stat-box"><div class="stat-val">0</div><div class="stat-label">Seguindo</div></div>
       </div>
       <div class="profile-tabs">
-        <div class="profile-tab active">Minhas trilhas</div>
-        <div class="profile-tab">📥 Offline</div>
+        <div class="profile-tab active" onclick="showProfileTab(this,'my-trails')">Minhas trilhas</div>
+        <div class="profile-tab" onclick="showProfileTab(this,'offline-trails')">📥 Offline</div>
       </div>
-      <div class="trail-list" style="padding:0 20px 20px">
-        <div class="trail-card" onclick="openDetail(0);goTo('detail')">
-          <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80" alt="">
-            <div class="diff-badge" style="background:#E53E3E">difícil</div>
-          </div>
-          <div class="card-body">
-            <div class="card-name">Trilha da Pedra do Baú</div>
-            <div class="card-loc">📍 São Bento do Sapucaí, SP</div>
-            <div class="card-stats">
-              <div class="card-stat">🗺️ 12,5 km</div>
-              <div class="card-stat">⭐ 4,8 (23)</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="my-trails" class="trail-list" style="padding:16px 20px 20px"></div>
+      <div id="offline-trails" style="display:none;padding:16px 20px 20px"></div>
     </div>
     <div class="bottom-nav">
-      <div class="nav-item" onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
-      <div class="nav-item" onclick="goTo('search')"><span class="icon">🔍</span>Buscar</div>
+      <div class="nav-item"        onclick="goTo('feed')"><span class="icon">🏠</span>Feed</div>
+      <div class="nav-item"        onclick="goTo('search-screen')"><span class="icon">🔍</span>Buscar</div>
       <div class="nav-item nav-add" onclick="goTo('create')"><div class="icon-wrap"><span class="icon">＋</span></div></div>
-      <div class="nav-item" onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
-      <div class="nav-item active" onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
+      <div class="nav-item"        onclick="goTo('map')"><span class="icon">🗺️</span>Mapa</div>
+      <div class="nav-item active"  onclick="goTo('profile')"><span class="icon">👤</span>Perfil</div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SCREEN: REVIEW
-  ══════════════════════════════════════════ -->
+  <!-- ══════════ REVIEW ══════════ -->
   <div class="screen" id="screen-review">
     <div class="scroll" style="padding:24px;text-align:center">
       <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px">Avaliar trilha</div>
-      <div style="font-size:14px;color:var(--text2);margin-bottom:32px">Como foi sua experiência?</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:32px" id="review-trail-name"></div>
       <div id="star-rating" style="display:flex;justify-content:center;gap:8px;font-size:40px;margin-bottom:12px">
-        <span onclick="setRating(1)" style="cursor:pointer">⭐</span>
-        <span onclick="setRating(2)" style="cursor:pointer">⭐</span>
-        <span onclick="setRating(3)" style="cursor:pointer">⭐</span>
-        <span onclick="setRating(4)" style="cursor:pointer">⭐</span>
-        <span onclick="setRating(5)" style="cursor:pointer">⭐</span>
+        <span onclick="setRating(1)" style="cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''">⭐</span>
+        <span onclick="setRating(2)" style="cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''">⭐</span>
+        <span onclick="setRating(3)" style="cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''">⭐</span>
+        <span onclick="setRating(4)" style="cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''">⭐</span>
+        <span onclick="setRating(5)" style="cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''">⭐</span>
       </div>
-      <div id="rating-label" style="font-size:16px;color:var(--text2);margin-bottom:32px">Toque para avaliar</div>
+      <div id="rating-label" style="font-size:16px;color:var(--text2);margin-bottom:32px;min-height:24px">Toque para avaliar</div>
       <div class="field" style="text-align:left">
         <label>Comentário (opcional)</label>
-        <textarea placeholder="Descreva sua experiência..." style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:14px;height:110px;resize:none;font-family:inherit"></textarea>
+        <textarea id="review-comment" placeholder="Descreva sua experiência..." style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:14px;height:110px;resize:none;font-family:inherit;outline:none"></textarea>
       </div>
-      <button class="submit-btn" onclick="alert('Avaliação publicada! ⭐ Obrigado pelo feedback.')">
-        Publicar avaliação
-      </button>
-      <div style="margin-top:16px;color:var(--text2);font-size:14px;cursor:pointer" onclick="goTo('detail')">← Voltar</div>
+      <button class="submit-btn" onclick="submitReview()">Publicar avaliação</button>
+      <div style="margin-top:16px;color:var(--text2);font-size:14px;cursor:pointer" onclick="goBack()">← Voltar</div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SCREEN: AUTH
-  ══════════════════════════════════════════ -->
+  <!-- ══════════ AUTH ══════════ -->
   <div class="screen" id="screen-auth">
     <div class="scroll">
-      <div class="auth-logo">
-        <div class="auth-logo-icon">🌲</div>
-        <h1>Wylder Trails</h1>
-        <p>Descubra, registre e explore trilhas</p>
-      </div>
-      <div class="auth-tabs">
-        <div class="auth-tab active" onclick="setAuthTab(this,'login')">Entrar</div>
-        <div class="auth-tab" onclick="setAuthTab(this,'register')">Criar conta</div>
-      </div>
-      <div class="auth-form">
-        <div class="field"><label>E-mail</label><input type="email" placeholder="seu@email.com"></div>
-        <div class="field"><label>Senha</label><input type="password" placeholder="Mínimo 8 caracteres"></div>
-        <button class="auth-submit" onclick="goTo('feed')">Entrar</button>
+      <div class="auth-wrap">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">🌲</div>
+          <h1>Wylder Trails</h1>
+          <p>Descubra, registre e explore trilhas</p>
+        </div>
+        <div class="auth-tabs">
+          <div class="auth-tab active" onclick="setAuthTab(this,'login')">Entrar</div>
+          <div class="auth-tab"       onclick="setAuthTab(this,'register')">Criar conta</div>
+        </div>
+        <div id="auth-name-field" class="field" style="display:none">
+          <label>Nome completo</label>
+          <input type="text" id="auth-name" placeholder="Seu nome">
+        </div>
+        <div class="field"><label>E-mail</label><input type="email" id="auth-email" placeholder="seu@email.com"></div>
+        <div class="field"><label>Senha</label><input type="password" id="auth-pass" placeholder="Mínimo 8 caracteres"></div>
+        <button class="auth-submit" onclick="doAuth()" id="auth-submit-btn">Entrar</button>
       </div>
       <div class="auth-skip" onclick="goTo('feed')">Continuar sem conta →</div>
     </div>
   </div>
+</div>
 
-</div><!-- /phone -->
+<div class="toast" id="toast"></div>
 
 <script>
-  // ── Dados das trilhas ──────────────────────────────────────────────────────
-  const trails = [
-    {
-      name: "Trilha da Pedra do Baú",
-      loc: "📍 São Bento do Sapucaí, SP · Brasil",
-      img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
-      diff: "difícil", diffColor: "#E53E3E",
-      dist: "12,5 km", dur: "5h", terrain: "íngreme",
-      rating: "4,8", ratingCount: "23",
-      badges: [
-        {icon:"🚗",label:"Carro"},{icon:"💧",label:"Cachoeira"},
-        {icon:"🧗",label:"Escalada"},{icon:"📵",label:"Sem sinal",danger:true},
-        {icon:"⛺",label:"Acampamento",show:false}
-      ],
-      seasons: ["verão","outono"],
-      reviews: [
-        {user:"João S.", rating:5, date:"12/11/2026", text:"Trilha incrível! Vista de tirar o fôlego no topo."},
-        {user:"Ana P.", rating:4, date:"05/11/2026", text:"Muito bonita mas exige preparo físico. Levei 6h."}
-      ]
-    },
-    {
-      name: "Circuito das Cachoeiras de Aiuruoca",
-      loc: "📍 Aiuruoca, MG · Brasil",
-      img: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
-      diff: "fácil", diffColor: "#38A169",
-      dist: "6,2 km", dur: "2h30", terrain: "plano",
-      rating: "4,6", ratingCount: "41",
-      badges: [
-        {icon:"🚗",label:"Carro"},{icon:"💧",label:"Cachoeira"},
-        {icon:"⛺",label:"Acampamento"},{icon:"🌊",label:"Travessia"}
-      ],
-      seasons: ["verão","primavera"],
-      reviews: [
-        {user:"Carlos M.", rating:5, date:"10/11/2026", text:"Perfeita para família! Crianças adoraram as cachoeiras."},
-        {user:"Lúcia F.", rating:4, date:"01/11/2026", text:"Muito bem sinalizada. Recomendo o mês de outubro."}
-      ]
-    },
-    {
-      name: "Travessia Serra dos Órgãos",
-      loc: "📍 Teresópolis, RJ · Brasil",
-      img: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
-      diff: "difícil", diffColor: "#E53E3E",
-      dist: "42 km", dur: "2 dias", terrain: "mesclado",
-      rating: "4,9", ratingCount: "87",
-      badges: [
-        {icon:"🚗",label:"Carro"},{icon:"💧",label:"Cachoeira"},
-        {icon:"⛺",label:"Acampamento"},{icon:"🧗",label:"Escalada"},
-        {icon:"🌊",label:"Travessia"},{icon:"⚠️",label:"Deslizamento",danger:true}
-      ],
-      seasons: ["outono","inverno"],
-      reviews: [
-        {user:"Rafael T.", rating:5, date:"08/11/2026", text:"A mais linda travessia do Brasil. Exige experiência."},
-        {user:"Fernanda L.", rating:5, date:"30/10/2026", text:"Inesquecível. Ponto de perigo na descida do Dedo de Deus."}
-      ]
-    }
-  ];
+// ═══════════════════════════════════════════════════════
+// DADOS
+// ═══════════════════════════════════════════════════════
+const SEED_TRAILS = [
+  {
+    id:1, name:"Trilha da Pedra do Baú",
+    city:"São Bento do Sapucaí", state:"SP", country:"Brasil",
+    img:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80",
+    diff:"difícil", diffColor:"#E53E3E",
+    dist:"12,5 km", distVal:12.5, dur:"5h", terrain:"íngreme",
+    rating:4.8, ratingCount:23,
+    lat:-22.6827, lng:-45.7291,
+    has_parking:true, has_waterfall:true, has_camping:false,
+    has_signal:false, has_climbing:true, has_river:false,
+    badges:[
+      {icon:"🚗",label:"Carro"},{icon:"💧",label:"Cachoeira"},
+      {icon:"🧗",label:"Escalada"},{icon:"📵",label:"Sem sinal",danger:true}
+    ],
+    seasons:["verão","outono"],
+    desc:"Trilha desafiadora com vista incrível da Serra da Mantiqueira. Exige boa forma física.",
+    reviews:[
+      {user:"João S.", rating:5, date:"12/11/2026", text:"Vista de tirar o fôlego no topo!"},
+      {user:"Ana P.",  rating:4, date:"05/11/2026", text:"Muito bonita mas exige preparo. Levei 6h."}
+    ]
+  },
+  {
+    id:2, name:"Circuito das Cachoeiras de Aiuruoca",
+    city:"Aiuruoca", state:"MG", country:"Brasil",
+    img:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80",
+    diff:"fácil", diffColor:"#38A169",
+    dist:"6,2 km", distVal:6.2, dur:"2h30", terrain:"plano",
+    rating:4.6, ratingCount:41,
+    lat:-22.0244, lng:-44.6085,
+    has_parking:true, has_waterfall:true, has_camping:true,
+    has_signal:true, has_climbing:false, has_river:true,
+    badges:[
+      {icon:"🚗",label:"Carro"},{icon:"💧",label:"Cachoeira"},
+      {icon:"⛺",label:"Acampamento"},{icon:"🌊",label:"Travessia"}
+    ],
+    seasons:["verão","primavera"],
+    desc:"Trilha suave por entre cachoeiras e mata atlântica preservada. Ótima para famílias.",
+    reviews:[
+      {user:"Carlos M.", rating:5, date:"10/11/2026", text:"Perfeita para família! Crianças adoraram."},
+      {user:"Lúcia F.",  rating:4, date:"01/11/2026", text:"Bem sinalizada. Recomendo outubro."}
+    ]
+  },
+  {
+    id:3, name:"Travessia Serra dos Órgãos",
+    city:"Teresópolis", state:"RJ", country:"Brasil",
+    img:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80",
+    diff:"difícil", diffColor:"#E53E3E",
+    dist:"42 km", distVal:42, dur:"2 dias", terrain:"mesclado",
+    rating:4.9, ratingCount:87,
+    lat:-22.4082, lng:-42.9861,
+    has_parking:true, has_waterfall:true, has_camping:true,
+    has_signal:false, has_climbing:true, has_river:true,
+    badges:[
+      {icon:"🚗",label:"Carro"},{icon:"💧",label:"Cachoeira"},
+      {icon:"⛺",label:"Acampamento"},{icon:"🧗",label:"Escalada"},
+      {icon:"🌊",label:"Travessia"},{icon:"⚠️",label:"Deslizamento",danger:true}
+    ],
+    seasons:["outono","inverno"],
+    desc:"Travessia clássica do Parque Nacional. Exige experiência e equipamentos adequados.",
+    reviews:[
+      {user:"Rafael T.",   rating:5, date:"08/11/2026", text:"A mais linda travessia do Brasil!"},
+      {user:"Fernanda L.", rating:5, date:"30/10/2026", text:"Inesquecível. Ponto de perigo na descida."}
+    ]
+  }
+];
 
-  // ── Navegação ─────────────────────────────────────────────────────────────
-  const screens = ['feed','detail','map','create','profile','review','auth'];
+// Estado global
+let trails = JSON.parse(localStorage.getItem('wylder_trails') || 'null') || [...SEED_TRAILS];
+let myTrails = JSON.parse(localStorage.getItem('wylder_my_trails') || '[]');
+let offlineTrails = JSON.parse(localStorage.getItem('wylder_offline') || '[]');
+let currentUser = JSON.parse(localStorage.getItem('wylder_user') || 'null');
+let currentFilter = 'all';
+let currentDetailIdx = 0;
+let currentRating = 0;
+let authMode = 'login';
+let gpsRunning = false, gpsTimer = null, gpsSecs = 0, gpsDist = 0, gpsPts = 0;
+let leafletMap = null, detailMap = null;
+let mapStyleIdx = 0;
+let screenHistory = ['feed'];
+let photoFiles = [];
 
-  function goTo(name) {
-    screens.forEach(s => {
-      const el = document.getElementById('screen-' + s);
-      if (el) el.classList.remove('active');
+const mapStyles = [
+  { name:'Padrão', url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attr:'© OpenStreetMap' },
+  { name:'Satélite', url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attr:'© Esri' },
+  { name:'Terreno', url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attr:'© OpenTopoMap' },
+];
+let tileLayer = null;
+
+// ═══════════════════════════════════════════════════════
+// PERSISTÊNCIA
+// ═══════════════════════════════════════════════════════
+function save() {
+  localStorage.setItem('wylder_trails', JSON.stringify(trails));
+  localStorage.setItem('wylder_my_trails', JSON.stringify(myTrails));
+  localStorage.setItem('wylder_offline', JSON.stringify(offlineTrails));
+  if (currentUser) localStorage.setItem('wylder_user', JSON.stringify(currentUser));
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════════════
+// RELÓGIO
+// ═══════════════════════════════════════════════════════
+function updateClock() {
+  const d = new Date();
+  document.getElementById('clock').textContent =
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+setInterval(updateClock, 10000); updateClock();
+
+// ═══════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════
+function goTo(name) {
+  const all = document.querySelectorAll('.screen');
+  all.forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + name);
+  if (!target) return;
+  target.classList.add('active');
+  if (screenHistory[screenHistory.length-1] !== name) screenHistory.push(name);
+  // Inicializar mapas quando entra na tela
+  if (name === 'map') setTimeout(initMainMap, 100);
+  if (name === 'detail') setTimeout(initDetailMap, 100);
+  if (name === 'profile') renderProfile();
+}
+function goBack() {
+  if (screenHistory.length > 1) {
+    screenHistory.pop();
+    goTo(screenHistory[screenHistory.length-1]);
+  } else { goTo('feed'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER TRAIL CARD
+// ═══════════════════════════════════════════════════════
+function trailCard(t, idx) {
+  return `<div class="trail-card" data-diff="${t.diff}" data-parking="${t.has_parking}" data-waterfall="${t.has_waterfall}" data-camping="${t.has_camping}" data-name="${t.name.toLowerCase()} ${t.city.toLowerCase()}" onclick="openDetail(${idx})">
+    <div class="card-img-wrap">
+      <img src="${t.img}" alt="${t.name}" loading="lazy">
+      <div class="diff-badge" style="background:${t.diffColor}">${t.diff}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-name">${t.name}</div>
+      <div class="card-loc">📍 ${t.city}, ${t.state}</div>
+      <div class="card-stats">
+        <div class="card-stat">🗺️ ${t.dist}</div>
+        <div class="card-stat">⏱️ ${t.dur}</div>
+        <div class="card-stat">⭐ ${t.rating.toFixed(1)} (${t.ratingCount})</div>
+      </div>
+      <div class="card-attrs">
+        ${t.has_parking ? '<div class="attr-icon">🚗</div>' : ''}
+        ${t.has_waterfall ? '<div class="attr-icon">💧</div>' : ''}
+        ${t.has_camping ? '<div class="attr-icon">⛺</div>' : ''}
+        ${!t.has_signal ? '<div class="attr-icon danger">📵</div>' : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// FEED — render + filtros + busca
+// ═══════════════════════════════════════════════════════
+function renderFeed() {
+  const list = document.getElementById('trail-list');
+  list.innerHTML = trails.map((t,i) => trailCard(t,i)).join('');
+  applyFilters();
+}
+
+function setFilter(el) {
+  document.querySelectorAll('#filter-row .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = el.dataset.filter;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const clear = document.getElementById('search-clear');
+  clear.style.display = q ? 'block' : 'none';
+  const cards = document.querySelectorAll('#trail-list .trail-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const diff    = card.dataset.diff;
+    const parking = card.dataset.parking === 'true';
+    const water   = card.dataset.waterfall === 'true';
+    const camp    = card.dataset.camping === 'true';
+    const name    = card.dataset.name;
+    let show = true;
+    if (q && !name.includes(q)) show = false;
+    if (currentFilter === 'fácil'    && diff !== 'fácil')    show = false;
+    if (currentFilter === 'moderada' && diff !== 'moderada') show = false;
+    if (currentFilter === 'difícil'  && diff !== 'difícil')  show = false;
+    if (currentFilter === 'parking'  && !parking)            show = false;
+    if (currentFilter === 'waterfall'&& !water)              show = false;
+    if (currentFilter === 'camping'  && !camp)               show = false;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const noRes = document.getElementById('no-results');
+  noRes.classList.toggle('show', visible === 0);
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  applyFilters();
+}
+
+// ═══════════════════════════════════════════════════════
+// SEARCH SCREEN
+// ═══════════════════════════════════════════════════════
+let searchFilter2 = 'all';
+
+function renderSearch2(list) {
+  const el = document.getElementById('search-list');
+  if (!list || list.length === 0) {
+    el.innerHTML = '';
+    document.getElementById('no-results2').classList.add('show');
+    return;
+  }
+  document.getElementById('no-results2').classList.remove('show');
+  el.innerHTML = list.map((t,i) => trailCard(t, trails.indexOf(t))).join('');
+}
+
+function setFilter2(el) {
+  document.querySelectorAll('[data-filter2]').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  searchFilter2 = el.dataset.filter2;
+  applySearch2();
+}
+
+function applySearch2() {
+  const q = document.getElementById('search-input2').value.trim().toLowerCase();
+  document.getElementById('search-clear2').style.display = q ? 'block' : 'none';
+  let result = trails.filter(t => {
+    const matchQ = !q || t.name.toLowerCase().includes(q) || t.city.toLowerCase().includes(q) || t.state.toLowerCase().includes(q);
+    const matchDiff = searchFilter2 === 'all' || t.diff === searchFilter2;
+    return matchQ && matchDiff;
+  });
+  renderSearch2(result);
+}
+
+function clearSearch2() {
+  document.getElementById('search-input2').value = '';
+  applySearch2();
+}
+
+// ═══════════════════════════════════════════════════════
+// DETAIL
+// ═══════════════════════════════════════════════════════
+function openDetail(idx) {
+  currentDetailIdx = idx;
+  const t = trails[idx];
+  document.getElementById('d-img').src = t.img;
+  document.getElementById('d-title').textContent = t.name;
+  document.getElementById('d-loc').textContent = `📍 ${t.city}, ${t.state} · ${t.country}  ⭐ ${t.rating.toFixed(1)} (${t.ratingCount})`;
+  document.getElementById('d-diff').textContent = t.diff;
+  document.getElementById('d-diff').style.background = t.diffColor;
+  document.getElementById('d-dist').textContent = t.dist;
+  document.getElementById('d-dur').textContent = t.dur;
+  document.getElementById('d-terrain').textContent = t.terrain;
+  document.getElementById('d-badges').innerHTML = (t.badges||[]).map(b =>
+    `<div class="badge${b.danger?' danger':''}">${b.icon} ${b.label}</div>`).join('');
+  document.getElementById('d-reviews').innerHTML = (t.reviews||[]).map(r =>
+    `<div class="review-card">
+      <div class="review-header">
+        <div class="review-avatar">${r.user[0]}</div>
+        <div><div class="review-name">${r.user}</div><div>${'⭐'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div></div>
+        <div class="review-date">${r.date}</div>
+      </div>
+      <div class="review-text">${r.text}</div>
+    </div>`).join('');
+  document.getElementById('review-trail-name').textContent = t.name;
+  goTo('detail');
+}
+
+function initDetailMap() {
+  const t = trails[currentDetailIdx];
+  const container = document.getElementById('detail-map');
+  container.style.height = '200px';
+  if (detailMap) { detailMap.remove(); detailMap = null; }
+  detailMap = L.map('detail-map', { zoomControl:true, attributionControl:false }).setView([t.lat, t.lng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(detailMap);
+  const icon = L.divIcon({
+    html:`<div style="background:${t.diffColor};width:28px;height:28px;border-radius:14px;border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🥾</div>`,
+    className:'', iconSize:[28,28], iconAnchor:[14,14]
+  });
+  L.marker([t.lat, t.lng], {icon}).addTo(detailMap).bindPopup(t.name).openPopup();
+  // Rota simulada
+  const r = 0.03;
+  const routePoints = [[t.lat+r,t.lng-r],[t.lat+r*0.5,t.lng],[t.lat,t.lng+r*0.3],[t.lat-r*0.3,t.lng+r],[t.lat,t.lng]];
+  L.polyline(routePoints, {color:'#1A5C38',weight:4,opacity:0.9}).addTo(detailMap);
+}
+
+function saveOffline() {
+  const t = trails[currentDetailIdx];
+  if (!offlineTrails.find(o => o.id === t.id)) {
+    offlineTrails.push(t);
+    save();
+    toast('✅ Trilha salva para uso offline!');
+  } else {
+    toast('⚠️ Trilha já está salva offline.');
+  }
+  renderProfile();
+}
+
+// ═══════════════════════════════════════════════════════
+// MAPA PRINCIPAL (Leaflet real, zoom e drag funcionando)
+// ═══════════════════════════════════════════════════════
+function initMainMap() {
+  if (leafletMap) { leafletMap.invalidateSize(); return; }
+  const center = [-22.0, -44.0];
+  leafletMap = L.map('leaflet-map', { zoomControl:true, attributionControl:false }).setView(center, 7);
+  tileLayer = L.tileLayer(mapStyles[0].url, { attribution:mapStyles[0].attr }).addTo(leafletMap);
+
+  const diffColors = { 'fácil':'#38A169', 'moderada':'#F4A228', 'difícil':'#E53E3E' };
+  trails.forEach((t, idx) => {
+    const c = diffColors[t.diff] || '#1A5C38';
+    const icon = L.divIcon({
+      html:`<div style="background:${c};width:34px;height:34px;border-radius:17px;border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer">🥾</div>`,
+      className:'', iconSize:[34,34], iconAnchor:[17,17]
     });
-    const target = document.getElementById('screen-' + name);
-    if (target) target.classList.add('active');
-    // Scroll top
-    const scroll = target && target.querySelector('.scroll, .create-scroll');
-    if (scroll) scroll.scrollTop = 0;
+    L.marker([t.lat, t.lng], {icon})
+      .addTo(leafletMap)
+      .bindPopup(`<b>${t.name}</b><br>${t.city}, ${t.state}<br>${t.dist} · ${t.diff}<br><a href="#" onclick="openDetail(${idx});goTo('detail');return false" style="color:#1A5C38;font-weight:600">Ver trilha →</a>`)
+      .on('click', function() { this.openPopup(); });
+  });
+}
+
+function toggleMapStyle() {
+  mapStyleIdx = (mapStyleIdx + 1) % mapStyles.length;
+  if (tileLayer) leafletMap.removeLayer(tileLayer);
+  tileLayer = L.tileLayer(mapStyles[mapStyleIdx].url, { attribution:mapStyles[mapStyleIdx].attr }).addTo(leafletMap);
+  toast('🗺️ Camada: ' + mapStyles[mapStyleIdx].name);
+}
+
+function centerMap() {
+  if (!leafletMap) return;
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 12);
+      L.circleMarker([pos.coords.latitude, pos.coords.longitude], {radius:8,color:'#1A5C38',fillColor:'#1A5C38',fillOpacity:1}).addTo(leafletMap);
+      toast('📍 Localização encontrada!');
+    }, () => { toast('❌ Localização não disponível'); });
+  } else { toast('❌ GPS não suportado'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// CREATE — form + submit
+// ═══════════════════════════════════════════════════════
+function pickSeg(groupId, el, color) {
+  document.querySelectorAll('#' + groupId + ' .seg-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = '';
+    b.style.color = '';
+    b.style.borderColor = '';
+  });
+  el.classList.add('active');
+  el.style.background = color;
+  el.style.borderColor = color;
+  el.style.color = 'white';
+}
+
+function toggleSeason(el) { el.classList.toggle('active'); }
+
+const photoSamples = [
+  'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=200&q=70',
+  'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=200&q=70',
+  'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=200&q=70',
+  'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=200&q=70',
+];
+
+function addPhoto() {
+  if (photoFiles.length >= 20) { toast('Máximo de 20 fotos'); return; }
+  const url = photoSamples[photoFiles.length % photoSamples.length];
+  photoFiles.push(url);
+  document.getElementById('photo-count').textContent = photoFiles.length;
+  const row = document.getElementById('photos-row');
+  const wrap = document.createElement('div');
+  wrap.className = 'photo-thumb-wrap';
+  const idx = photoFiles.length - 1;
+  wrap.innerHTML = `<img src="${url}" class="photo-thumb"><div class="photo-remove" onclick="removePhoto(${idx},this.parentElement)">✕</div>`;
+  row.insertBefore(wrap, row.firstChild);
+}
+
+function removePhoto(idx, el) {
+  photoFiles.splice(idx, 1);
+  el.remove();
+  document.getElementById('photo-count').textContent = photoFiles.length;
+}
+
+function toggleGPS() {
+  gpsRunning = !gpsRunning;
+  const btn = document.getElementById('gps-btn');
+  if (gpsRunning) {
+    btn.style.background = '#E53E3E';
+    document.getElementById('gps-icon').textContent = '⏹️';
+    document.getElementById('gps-text').textContent = 'Parar gravação';
+    gpsTimer = setInterval(() => {
+      gpsSecs++;
+      gpsDist += 0.003 + Math.random() * 0.005;
+      gpsPts++;
+      const h = String(Math.floor(gpsSecs/3600)).padStart(2,'0');
+      const m = String(Math.floor((gpsSecs%3600)/60)).padStart(2,'0');
+      const s = String(gpsSecs%60).padStart(2,'0');
+      document.getElementById('gps-time').textContent = `${h}:${m}:${s}`;
+      document.getElementById('gps-dist').textContent = gpsDist.toFixed(1) + ' km';
+      document.getElementById('gps-pts').textContent = gpsPts;
+    }, 1000);
+  } else {
+    clearInterval(gpsTimer);
+    btn.style.background = 'var(--primary)';
+    document.getElementById('gps-icon').textContent = '⏺️';
+    document.getElementById('gps-text').textContent = 'Iniciar gravação GPS';
+    if (gpsDist > 0) document.getElementById('f-dist').value = gpsDist.toFixed(1);
   }
+}
 
-  // ── Detail ────────────────────────────────────────────────────────────────
-  function openDetail(idx) {
-    const t = trails[idx];
-    document.getElementById('detail-img').src = t.img;
-    document.getElementById('detail-title').textContent = t.name;
-    document.getElementById('detail-loc').textContent = t.loc + '  ⭐ ' + t.rating + ' (' + t.ratingCount + ')';
-    const diff = document.getElementById('detail-diff');
-    diff.textContent = t.diff;
-    diff.style.background = t.diffColor;
-    document.getElementById('qs-dist').textContent = t.dist;
-    document.getElementById('qs-dur').textContent = t.dur;
-    document.getElementById('qs-terrain').textContent = t.terrain;
+function submitTrail() {
+  const name = document.getElementById('f-name').value.trim();
+  const dist = parseFloat(document.getElementById('f-dist').value) || gpsDist;
+  if (!name) { toast('⚠️ Informe o nome da trilha'); return; }
+  if (!dist || dist <= 0) { toast('⚠️ Informe a distância (ou grave o GPS)'); return; }
 
-    // Badges
-    const badgesEl = document.getElementById('detail-badges');
-    badgesEl.innerHTML = t.badges.map(b =>
-      `<div class="badge${b.danger?' danger':''}">${b.icon} ${b.label}</div>`
-    ).join('');
+  const diff    = document.querySelector('#seg-diff .seg-btn.active')?.dataset.val || 'moderada';
+  const terrain = document.querySelector('#seg-terrain .seg-btn.active')?.dataset.val || 'mesclado';
+  const city    = document.getElementById('f-city').value.trim() || 'Localização';
+  const state   = document.getElementById('f-uf').value.trim() || '';
+  const desc    = document.getElementById('f-desc').value.trim();
+  const fauna   = document.getElementById('f-fauna').value.trim();
+  const seasons = [...document.querySelectorAll('[data-season].active')].map(e => e.dataset.season);
+  const diffColors = {'fácil':'#38A169','moderada':'#F4A228','difícil':'#E53E3E'};
+  const dur = gpsSecs > 0 ? (Math.floor(gpsSecs/3600) + 'h' + (Math.floor((gpsSecs%3600)/60) > 0 ? Math.floor((gpsSecs%3600)/60)+'min':'')) : '—';
 
-    // Reviews
-    const revEl = document.getElementById('detail-reviews');
-    revEl.innerHTML = t.reviews.map(r =>
-      `<div class="review-card">
-        <div class="review-header">
-          <div class="review-avatar">${r.user[0]}</div>
-          <div>
-            <div class="review-name">${r.user}</div>
-            <div class="stars">${'⭐'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
-          </div>
-          <div class="review-date">${r.date}</div>
-        </div>
-        <div class="review-text">${r.text}</div>
-      </div>`
-    ).join('');
+  const newTrail = {
+    id: Date.now(),
+    name, city, state, country:'Brasil',
+    img: photoFiles[0] || 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80',
+    diff, diffColor: diffColors[diff],
+    dist: dist.toFixed(1) + ' km', distVal: dist, dur, terrain,
+    rating: 0, ratingCount: 0,
+    lat: -22.0 + (Math.random()-0.5)*4,
+    lng: -44.0 + (Math.random()-0.5)*4,
+    has_parking: document.getElementById('t-parking').classList.contains('on'),
+    has_waterfall: document.getElementById('t-waterfall').classList.contains('on'),
+    has_camping: document.getElementById('t-camping').classList.contains('on'),
+    has_signal: document.getElementById('t-signal').classList.contains('on'),
+    has_climbing: document.getElementById('t-climb').classList.contains('on'),
+    has_river: document.getElementById('t-river').classList.contains('on'),
+    badges: buildBadges(),
+    seasons, desc, fauna_flora: fauna, reviews: [],
+    isUserCreated: true,
+    author: currentUser ? currentUser.name : 'Você'
+  };
 
-    goTo('detail');
+  trails.unshift(newTrail);
+  if (currentUser) {
+    myTrails.unshift(newTrail);
+    currentUser.trails_count = (currentUser.trails_count || 0) + 1;
+    if (currentUser.trails_count >= 21) currentUser.level = 'veterano';
+    else if (currentUser.trails_count >= 6) currentUser.level = 'explorador';
   }
+  save();
+  resetCreateForm();
+  renderFeed();
+  toast('✅ Trilha publicada com sucesso!');
+  setTimeout(() => goTo('feed'), 500);
+}
 
-  // ── Filtros ───────────────────────────────────────────────────────────────
-  function setFilter(el, key) {
-    document.querySelectorAll('.filter-row .chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
+function buildBadges() {
+  const b = [];
+  if (document.getElementById('t-parking').classList.contains('on'))   b.push({icon:"🚗",label:"Carro"});
+  if (document.getElementById('t-waterfall').classList.contains('on')) b.push({icon:"💧",label:"Cachoeira"});
+  if (document.getElementById('t-camping').classList.contains('on'))   b.push({icon:"⛺",label:"Acampamento"});
+  if (document.getElementById('t-climb').classList.contains('on'))     b.push({icon:"🧗",label:"Escalada"});
+  if (document.getElementById('t-river').classList.contains('on'))     b.push({icon:"🌊",label:"Travessia"});
+  if (!document.getElementById('t-signal').classList.contains('on'))   b.push({icon:"📵",label:"Sem sinal",danger:true});
+  return b;
+}
+
+function resetCreateForm() {
+  ['f-name','f-desc','f-city','f-uf','f-dist','f-fauna'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  photoFiles = [];
+  document.getElementById('photo-count').textContent = '0';
+  const row = document.getElementById('photos-row');
+  row.innerHTML = '<div class="photo-add" onclick="addPhoto()">📷<span>Adicionar</span></div>';
+  gpsSecs = 0; gpsDist = 0; gpsPts = 0;
+  document.getElementById('gps-time').textContent = '00:00:00';
+  document.getElementById('gps-dist').textContent = '0,0 km';
+  document.getElementById('gps-pts').textContent = '0';
+  document.querySelectorAll('[data-season]').forEach(e => e.classList.remove('active'));
+}
+
+// ═══════════════════════════════════════════════════════
+// REVIEW
+// ═══════════════════════════════════════════════════════
+const ratingLabels = ['','😕 Muito ruim','😐 Ruim','🙂 Regular','😊 Boa','🤩 Excelente!'];
+function setRating(n) {
+  currentRating = n;
+  document.querySelectorAll('#star-rating span').forEach((s, i) => {
+    s.textContent = i < n ? '⭐' : '☆';
+  });
+  document.getElementById('rating-label').textContent = ratingLabels[n];
+}
+
+function submitReview() {
+  if (currentRating === 0) { toast('⚠️ Selecione uma nota de 1 a 5'); return; }
+  const comment = document.getElementById('review-comment').value.trim();
+  const t = trails[currentDetailIdx];
+  const review = {
+    user: currentUser ? currentUser.name : 'Visitante',
+    rating: currentRating,
+    date: new Date().toLocaleDateString('pt-BR'),
+    text: comment || '—'
+  };
+  if (!t.reviews) t.reviews = [];
+  t.reviews.unshift(review);
+  const total = t.ratingCount + 1;
+  t.rating = ((t.rating * t.ratingCount) + currentRating) / total;
+  t.ratingCount = total;
+  save();
+  currentRating = 0;
+  document.getElementById('review-comment').value = '';
+  document.querySelectorAll('#star-rating span').forEach(s => s.textContent = '⭐');
+  document.getElementById('rating-label').textContent = 'Toque para avaliar';
+  toast('⭐ Avaliação publicada! Obrigado.');
+  setTimeout(() => openDetail(currentDetailIdx), 400);
+}
+
+// ═══════════════════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════════════════
+function renderProfile() {
+  if (currentUser) {
+    document.getElementById('prof-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+    document.getElementById('prof-name').textContent   = currentUser.name;
+    document.getElementById('prof-level').textContent  = levelIcon(currentUser.level||'iniciante') + ' ' + capitalize(currentUser.level||'iniciante');
+    document.getElementById('prof-trails').textContent = currentUser.trails_count || 0;
   }
+  // Minhas trilhas
+  const myList  = document.getElementById('my-trails');
+  const userTrails = currentUser ? myTrails : [];
+  myList.innerHTML = userTrails.length
+    ? userTrails.map((t,i) => trailCard(t, trails.indexOf(t) >= 0 ? trails.indexOf(t) : 0)).join('')
+    : '<div class="empty-state"><div class="empty-icon">🥾</div><p>Você ainda não cadastrou trilhas</p></div>';
 
-  // ── GPS simulado ──────────────────────────────────────────────────────────
-  let gpsRunning = false, gpsTimer = null, gpsSecs = 0, gpsDist = 0, gpsPts = 0;
+  // Offline
+  const offList = document.getElementById('offline-trails');
+  offList.innerHTML = offlineTrails.length
+    ? offlineTrails.map((t,i) => `<div class="saved-item" onclick="openDetail(${trails.findIndex(x=>x.id===t.id)||0})"><img src="${t.img}" alt=""><div class="saved-item-info"><div class="saved-name">${t.name}</div><div class="saved-sub">${t.city}, ${t.state} · ${t.dist}</div></div></div>`).join('')
+    : '<div class="empty-state"><div class="empty-icon">📥</div><p>Nenhuma trilha salva offline</p></div>';
+}
 
-  function toggleGPS() {
-    gpsRunning = !gpsRunning;
-    const btn = document.getElementById('gps-btn');
-    const icon = document.getElementById('gps-icon');
-    const text = document.getElementById('gps-text');
-    if (gpsRunning) {
-      btn.style.background = '#E53E3E';
-      icon.textContent = '⏹️';
-      text.textContent = 'Parar gravação';
-      gpsTimer = setInterval(() => {
-        gpsSecs++;
-        gpsDist += 0.003 + Math.random() * 0.005;
-        gpsPts++;
-        const h = String(Math.floor(gpsSecs/3600)).padStart(2,'0');
-        const m = String(Math.floor((gpsSecs%3600)/60)).padStart(2,'0');
-        const s = String(gpsSecs%60).padStart(2,'0');
-        document.getElementById('gps-time').textContent = `${h}:${m}:${s}`;
-        document.getElementById('gps-dist').textContent = gpsDist.toFixed(1) + ' km';
-        document.getElementById('gps-pts').textContent = gpsPts;
-      }, 1000);
-    } else {
-      clearInterval(gpsTimer);
-      btn.style.background = 'var(--primary)';
-      icon.textContent = '⏺️';
-      text.textContent = 'Iniciar gravação GPS';
-    }
-  }
+function showProfileTab(el, tabId) {
+  document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('my-trails').style.display      = tabId === 'my-trails'      ? '' : 'none';
+  document.getElementById('offline-trails').style.display = tabId === 'offline-trails' ? '' : 'none';
+}
 
-  // ── Dificuldade ───────────────────────────────────────────────────────────
-  function setDiff(el, name, color) {
-    document.querySelectorAll('.segmented .seg-btn').forEach(b => {
-      b.classList.remove('active');
-      b.style.background = '';
-      b.style.color = '';
-      b.style.borderColor = '';
-    });
-    el.classList.add('active');
-    el.style.background = color;
-    el.style.borderColor = color;
-    el.style.color = 'white';
-  }
+function levelIcon(level) {
+  return level === 'veterano' ? '🏔️' : level === 'explorador' ? '🧭' : '🌱';
+}
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-  function setSeg(el) {
-    const parent = el.parentElement;
-    parent.querySelectorAll('.seg-btn').forEach(b => {
-      b.classList.remove('active');
-      b.style.background = '';
-      b.style.color = '';
-      b.style.borderColor = '';
-    });
-    el.classList.add('active');
-    el.style.background = 'var(--primary)';
-    el.style.borderColor = 'var(--primary)';
-    el.style.color = 'white';
-  }
+// ═══════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════
+function setAuthTab(el, mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('auth-name-field').style.display = mode === 'register' ? '' : 'none';
+  document.getElementById('auth-submit-btn').textContent = mode === 'register' ? 'Criar conta' : 'Entrar';
+}
 
-  // ── Rating ────────────────────────────────────────────────────────────────
-  const ratingLabels = ['','Muito ruim','Ruim','Regular','Boa','Excelente! 🎉'];
-  function setRating(n) {
-    document.getElementById('rating-label').textContent = ratingLabels[n];
-  }
+function doAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  if (!email || !pass) { toast('⚠️ Preencha e-mail e senha'); return; }
+  if (pass.length < 8) { toast('⚠️ Senha mínimo 8 caracteres'); return; }
+  const name = authMode === 'register' ? (document.getElementById('auth-name').value.trim() || email.split('@')[0]) : (email.split('@')[0]);
+  currentUser = { name, email, level:'iniciante', trails_count: myTrails.length };
+  save();
+  toast('✅ Bem-vindo, ' + name + '!');
+  setTimeout(() => { goTo('feed'); renderProfile(); }, 400);
+}
 
-  // ── Auth tabs ─────────────────────────────────────────────────────────────
-  function setAuthTab(el, mode) {
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-  }
+// ═══════════════════════════════════════════════════════
+// INICIALIZAÇÃO
+// ═══════════════════════════════════════════════════════
+renderFeed();
+applySearch2();
+renderProfile();
 </script>
 </body>
 </html>
